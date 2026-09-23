@@ -10,13 +10,13 @@ from schemas import TaskCreate, TaskUpdate, TaskResponse
 
 app = FastAPI(title="To Do List API")
 
-# Cấu hình CORS để Frontend (Angular) gọi được API
+# Configure CORS to allow the Frontend (Angular) to call the API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Cho phép mọi trang web (kể cả Angular localhost:4200) truy cập API
-    allow_credentials=True, # Cho phép gửi kèm cookie hoặc thông tin xác thực
-    allow_methods=["*"], # Cho phép gửi mọi lệnh HTTP (GET, POST, PUT, DELETE)
-    allow_headers=["*"], # Cho phép gửi kèm mọi tiêu đề dữ liệu (Headers)
+    allow_origins=["*"],  # Allow all websites (including Angular localhost:4200) to access the API
+    allow_credentials=True, # Allow sending cookies or authentication information
+    allow_methods=["*"], # Allow sending all HTTP methods (GET, POST, PUT, DELETE)
+    allow_headers=["*"], # Allow sending all Headers
 )
 
 def task_helper(task) -> dict:
@@ -29,7 +29,7 @@ def task_helper(task) -> dict:
         "title": task["title"],
         "description": task.get("description"),
         "is_completed": task.get("is_completed", False),
-        "priority": task.get("priority", "Low"),
+        "priority": task.get("priority", "low"),
         "due_date": task.get("due_date"),
         "created_at": created_at,
         "updated_at": updated_at,
