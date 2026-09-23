@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional
@@ -18,21 +20,37 @@ app.add_middleware(
 )
 
 def task_helper(task) -> dict:
+    now = datetime.now(timezone.utc)
+    created_at = task.get("created_at") or task.get("create_at") or now
+    updated_at = task.get("updated_at") or task.get("update_at") or now
+
     return {
         "id": str(task["_id"]),
         "title": task["title"],
         "description": task.get("description"),
-        "is_completed": task.get("is_completed", False)
+        "is_completed": task.get("is_completed", False),
+        "priority": task.get("priority", "Low"),
+        "due_date": task.get("due_date"),
+        "created_at": created_at,
+        "updated_at": updated_at,
     }
 
 # Get all tasks
 @app.get("/tasks", response_model=List[TaskResponse])
-async def get_tasks(is_completed: Optional[bool] = None):
+async def get_tasks(
+    is_completed: Optional[bool] = None,
+    priority: Optional[str] = None,
+    search: Optional[str] = None,
+):
     query = {}
     if is_completed is not None:
         query["is_completed"] = is_completed
+    if priority is not None:
+        query["priority"] = {"\(regex": f"^{priority}\)", "$options": "i"}
+    if search:
+        query["title"] = {"\(regex": search, "\)options": "i"}
     tasks = []
-    async for task in task_collection.find(query):
+    async for task in task_collection.find(query).sort("created_at", -1):
         tasks.append(task_helper(task))
     return tasks
 
@@ -49,7 +67,10 @@ async def get_task(task_id: str):
 # Create task
 @app.post("/tasks", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
 async def create_task(task_data: TaskCreate):
+    now = datetime.now(timezone.utc)
     new_task = task_data.model_dump()
+    new_task["created_at"] = now
+    new_task["update_at"] = now
     result = await task_collection.insert_one(new_task)
     created_task = await task_collection.find_one({"_id": result.inserted_id})
     return task_helper(created_task)
@@ -63,6 +84,7 @@ async def update_task(task_id: str, task_data: TaskUpdate):
     update_data = {k: v for k, v in task_data.model_dump().items() if v is not None}
     
     if update_data:
+        update_data["update_at"] = datetime.now(timezone.utc)
         await task_collection.update_one({"_id": ObjectId(task_id)}, {"$set": update_data})
         
     updated_task = await task_collection.find_one({"_id": ObjectId(task_id)})
