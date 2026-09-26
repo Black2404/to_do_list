@@ -1,0 +1,91 @@
+<h1>Todo List</h1>
+
+<!-- ADD TASK -->
+<h2>Add Task</h2>
+
+<input
+  type="text"
+  placeholder="Title"
+  #titleInput
+>
+
+<input
+  type="text"
+  placeholder="Description"
+  #descriptionInput
+>
+
+<select #priorityInput>
+  <option value="low">Low</option>
+  <option value="medium">Medium</option>
+  <option value="high">High</option>
+</select>
+
+<input
+  type="date"
+  #dueDateInput
+>
+
+<button
+  (click)="addTaskFromForm(
+    titleInput.value,
+    descriptionInput.value,
+    priorityInput.value,
+    dueDateInput.value
+  )"
+>
+  Add Task
+</button>
+
+<hr>
+
+<!-- TASK LIST -->
+<h2>Task List</h2>
+<table border="1">
+
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Priority</th>
+      <th>Status</th>
+      <th>Due date</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    @for (task of tasks; track task.id) {
+      <tr>
+        <td>
+          {{ task.title }}
+        </td>
+
+        <td>
+          {{ task.priority }}
+        </td>
+
+        <td>
+          @if (task.is_completed) {
+            Completed
+          } @else {
+            Not completed
+          }
+        </td>
+
+        <td>
+          {{ task.due_date || 'No due date' }}
+        </td>
+
+        <td>
+          <button [routerLink]="['/tasks', task.id]">
+            View
+          </button>
+
+          <button (click)="deleteTask(task.id)">
+            Delete
+          </button>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>
