@@ -10,10 +10,10 @@ from schemas import TaskCreate, TaskUpdate, TaskResponse
 
 app = FastAPI(title="To Do List API")
 
-# Configure CORS to allow the Frontend (Angular) to call the API
+# Configure CORS to allow the Frontend to call the API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all websites (including Angular localhost:4200) to access the API
+    allow_origins=["http://localhost:4200", "http://127.0.0.1:4200",],  # Allow all websites to access the API
     allow_credentials=True, # Allow sending cookies or authentication information
     allow_methods=["*"], # Allow sending all HTTP methods (GET, POST, PUT, DELETE)
     allow_headers=["*"], # Allow sending all Headers
@@ -21,8 +21,8 @@ app.add_middleware(
 
 def task_helper(task) -> dict:
     now = datetime.now(timezone.utc)
-    created_at = task.get("created_at") or task.get("create_at") or now
-    updated_at = task.get("updated_at") or task.get("update_at") or now
+    created_at = task.get("created_at") or now
+    updated_at = task.get("updated_at") or now
 
     return {
         "id": str(task["_id"]),
