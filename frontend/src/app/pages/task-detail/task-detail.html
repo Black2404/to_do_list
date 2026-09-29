@@ -1,0 +1,116 @@
+@if (!isEditing) {
+
+  <!-- VIEW MODE -->
+
+  <h2>View Task Detail</h2>
+
+  <div class="task-detail">
+    <p>
+      <strong>Title:</strong>
+      {{ task?.title }}
+    </p>
+
+    <p>
+      <strong>Description:</strong>
+      {{ task?.description }}
+    </p>
+
+    <p>
+      <strong>Priority:</strong>
+      {{ task?.priority }}
+    </p>
+
+    <p>
+      <strong>Status:</strong>
+      @if (task?.is_completed) {
+        Completed
+      } @else {
+        Not completed
+      }
+    </p>
+
+    <p>
+      <strong>Due date:</strong>
+      {{ task?.due_date || 'No due date' }}
+    </p>
+  </div>
+
+  <button
+    type="button"
+    (click)="editTask()">
+    Edit
+  </button>
+
+} @else {
+
+  <!-- EDIT MODE -->
+
+  <h2>Edit Task Detail</h2>
+
+  <div class="edit-form">
+
+    <div class="form-group">
+      <label>Title</label>
+
+      <input
+        type="text"
+        [(ngModel)]="task!.title">
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+
+      <textarea
+        [(ngModel)]="task!.description"
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Priority</label>
+
+      <select [(ngModel)]="task!.priority">
+        <option value="low">
+          Low
+        </option>
+
+        <option value="medium">
+          Medium
+        </option>
+
+        <option value="high">
+          High
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Completed</label>
+
+      <input
+        type="checkbox"
+        [(ngModel)]="task!.is_completed">
+    </div>
+
+    <div class="form-group">
+      <label>Due date</label>
+
+      <input
+        type="date"
+        [(ngModel)]="task!.due_date">
+    </div>
+
+    <div class="button-group">
+      <button
+        type="button"
+        (click)="updateTask()">
+        Update
+      </button>
+
+      <button
+        type="button"
+        (click)="cancelEdit()">
+        Cancel
+      </button>
+    </div>
+  </div>
+}
